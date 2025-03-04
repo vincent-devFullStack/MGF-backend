@@ -191,7 +191,7 @@ const eleveSchema = mongoose.Schema({
   conversations: [
     {
       date: Date,
-      name: { type: mongoose.Schema.Types.ObjectId, ref: "coachs" },
+      firstname: String,
       texte: String,
     },
   ],
