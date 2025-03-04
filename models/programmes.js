@@ -2,10 +2,13 @@ const mongoose = require("mongoose");
 
 const programmeSchema = mongoose.mongoose.Schema({
   name: String,
-  seances: Number,
   duree: Number,
+  description: String,
   photo: String,
-  seances: [[{ type: mongoose.Schema.Types.ObjectId, ref: "exercices" }]],
+  seances: Number,
+  exercices: [[{ type: mongoose.Schema.Types.ObjectId, ref: "exercices" }]],
+  series: Number,
+  repetitions: Number,
 });
 
 const Programme = mongoose.model("programmes", programmeSchema);
