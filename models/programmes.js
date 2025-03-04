@@ -6,9 +6,12 @@ const programmeSchema = mongoose.mongoose.Schema({
   description: String,
   photo: String,
   seances: Number,
-  exercices: [[{ type: mongoose.Schema.Types.ObjectId, ref: "exercices" }]],
-  series: Number,
-  repetitions: Number,
+  exercices: [
+    [
+      { type: mongoose.Schema.Types.ObjectId, ref: "exercices" },
+      { series: Number, repetitions: Number },
+    ],
+  ],
 });
 
 const Programme = mongoose.model("programmes", programmeSchema);
