@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 const { checkBody } = require("../modules/CheckBody");
 
+const uniqid = require("uniqid");
+
 const Eleve = require("../models/eleves");
 
 /* GET élèves data */
@@ -51,7 +53,7 @@ router.post("/chat", async (req, res) => {
 });
 
 /* Ajout premières mesures */
-router.post("/new-mesures", async (req, res) => {
+router.post("/first-mesures", async (req, res) => {
   if (
     !checkBody(req.body, [
       "token",
@@ -80,7 +82,8 @@ router.post("/new-mesures", async (req, res) => {
         cuisse: req.body.cuisse,
         mollet: req.body.mollet,
       },
-    }
+    },
+    { new: true }
   );
 
   if (!mesures) {
@@ -120,7 +123,8 @@ router.post("/mesures", async (req, res) => {
         cuisse: req.body.cuisse,
         mollet: req.body.mollet,
       },
-    }
+    },
+    { new: true }
   );
 
   if (!mesures) {
@@ -155,27 +159,160 @@ router.post("/ossature", async (req, res) => {
   const ossatures = await Eleve.findOneAndUpdate(
     { token: req.body.token },
     {
-      skeleton: {
-        type: req.body.type,
-        os: req.body.os,
-        clavicule: req.body.clavicule,
-        humerus: req.body.humerus,
-        avantBras: req.body.avantBras,
-        buste: req.body.buste,
-        thorax: req.body.thorax,
-        abdomen: req.body.abdomen,
-        hanches: req.body.hanches,
-        femur: req.body.femur,
-        tibia: req.body.tibia,
-      },
-    }
+      "skeleton.type": req.body.type,
+      "skeleton.os": req.body.os,
+      "skeleton.clavicule": req.body.clavicule,
+      "skeleton.humerus": req.body.humerus,
+      "skeleton.avantBras": req.body.avantBras,
+      "skeleton.buste": req.body.buste,
+      "skeleton.thorax": req.body.thorax,
+      "skeleton.abdomen": req.body.abdomen,
+      "skeleton.hanches": req.body.hanches,
+      "skeleton.femur": req.body.femur,
+      "skeleton.tibia": req.body.tibia,
+    },
+    { new: true }
   );
 
   if (!ossatures) {
-    return res.json({ error: "Body mesures weren't updated!" });
+    return res.json({ error: "Skeletons weren't updated!" });
   }
 
-  res.json({ result: true, message: "Body mesures were updated!" });
+  res.json({ result: true, message: "Skeletons were updated!" });
+});
+
+/* Ajout morphologie muscles */
+router.post("/ossature", async (req, res) => {
+  if (
+    !checkBody(req.body, [
+      "token",
+      "deltoidAnt",
+      "deltoidLat",
+      "deltoidPost",
+      "biceps",
+      "triceps",
+      "abSup",
+      "abPro",
+      "trapezeSup",
+      "trapezeMoy",
+      "trapezeInf",
+      "grandDorsal",
+      "pectoraux",
+      "abdominaux",
+      "obliques",
+      "cou",
+      "quadriceps",
+      "ischios",
+      "fessiers",
+      "abducteurs",
+      "mollets",
+      "tibias",
+    ])
+  ) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  const muscles = await Eleve.findOneAndUpdate(
+    { token: req.body.token },
+    {
+      "muscles.deltoidAnt": req.body.deltoidAnt,
+      "muscles.deltoidLat": req.body.deltoidLat,
+      "muscles.deltoidPost": req.body.deltoidPost,
+      "muscles.biceps": req.body.biceps,
+      "muscles.triceps": req.body.triceps,
+      "muscles.abSup": req.body.abSup,
+      "muscles.abPro": req.body.abPro,
+      "muscles.trapezeSup": req.body.trapezeSup,
+      "muscles.trapezeMoy": req.body.trapezeMoy,
+      "muscles.trapezeInf": req.body.trapezeInf,
+      "muscles.grandDorsal": req.body.grandDorsal,
+      "muscles.pectoraux": req.body.pectoraux,
+      "muscles.abdominaux": req.body.abdominaux,
+      "muscles.obliques": req.body.obliques,
+      "muscles.cou": req.body.cou,
+      "muscles.quadriceps": req.body.quadriceps,
+      "muscles.ischios": req.body.ischios,
+      "muscles.fessiers": req.body.fessiers,
+      "muscles.abducteurs": req.body.abducteurs,
+      "muscles.mollets": req.body.mollets,
+      "muscles.tibias": req.body.tibias,
+    },
+    { new: true }
+  );
+
+  if (!muscles) {
+    return res.json({ error: "Morphologies weren't updated!" });
+  }
+
+  res.json({ result: true, message: "Morphologies were updated!" });
+});
+
+/* Upload photo */
+router.post("/upload", async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  const resultMove = await req.files.photoFromFront.mv(photoPath);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+
+    fs.unlinkSync(photoPath);
+
+    res.json({
+      result: true,
+      url: cloudinary.url(resultCloudinary.secure_url),
+    });
+  } else {
+    res.json({ result: false, error: resultMove });
+  }
+});
+
+/* Ajout premières photos */
+router.post("/first-photos", async (req, res) => {
+  if (!checkBody(req.body, ["token", "front", "back", "profil"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  const photos = await Eleve.findOneAndUpdate(
+    { token: req.body.token },
+    {
+      "photos.depart.front": req.body.front,
+      "photos.depart.back": req.body.back,
+      "photos.depart.front": req.body.profil,
+    },
+    { new: true }
+  );
+
+  if (!photos) {
+    return res.json({ error: "Pictures weren't added!" });
+  }
+
+  res.json({ result: true, message: "Pictures were added!" });
+});
+
+/* Ajout photos actuelles*/
+router.post("/photos", async (req, res) => {
+  if (!checkBody(req.body, ["token", "front", "back", "profil"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  const photos = await Eleve.findOneAndUpdate(
+    { token: req.body.token },
+    {
+      "photos.actuelles.front": req.body.front,
+      "photos.actuelles.back": req.body.back,
+      "photos.actuelles.front": req.body.profil,
+    },
+    { new: true }
+  );
+
+  if (!photos) {
+    return res.json({ error: "Pictures weren't added!" });
+  }
+
+  res.json({ result: true, message: "Pictures were added!" });
 });
 
 module.exports = router;
