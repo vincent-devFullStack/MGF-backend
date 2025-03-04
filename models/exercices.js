@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const exerciceSchema = mongoose.Schema({
   name: String,
+  description: String,
   photo: String,
   video: String,
-  description: String,
   ciblage: String,
   utilisationMuscle: Number,
   categorie: String,
