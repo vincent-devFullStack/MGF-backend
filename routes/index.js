@@ -28,7 +28,6 @@ router.post("/signupEleve", (req, res) => {
       "taille",
       "dateNaissance",
       "poids",
-      "morphologie",
     ])
   ) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -52,7 +51,6 @@ router.post("/signupEleve", (req, res) => {
         taille: req.body.taille,
         dateNaissance: req.body.dateNaissance,
         poids: req.body.poids,
-        morphologie: req.body.morphologie,
       });
 
       newEleve.save().then((newDoc) => {
