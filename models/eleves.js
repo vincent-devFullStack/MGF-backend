@@ -34,7 +34,16 @@ const eleveSchema = mongoose.Schema({
       profil: String,
     },
   },
-  body: {
+  bodyDepart: {
+    cou: Number,
+    poitrine: Number,
+    biceps: Number,
+    taille: Number,
+    hanche: Number,
+    cuisse: Number,
+    mollet: Number,
+  },
+  bodyActuel: {
     cou: Number,
     poitrine: Number,
     biceps: Number,
