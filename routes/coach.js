@@ -8,7 +8,7 @@ router.get("/:token", async (req, res) => {
   const token = req.params.token;
 
   if (!token) {
-    return res.status(400).json({ error: "Token requis" });
+    return res.json({ error: "Token requis" });
   }
   const coach = await Coach.findOne({ token }).populate("eleves");
   if (!coach) {
@@ -17,36 +17,53 @@ router.get("/:token", async (req, res) => {
   res.json({ result: true, eleves: coach.eleves });
 });
 
-router.post("/addEleve", (req, res) => {
-  const { coachId, eleveId } = req.body;
+router.post("/addEleve", async (req, res) => {
+  const { coachToken, eleveToken } = req.body;
+  if (!coachToken || !eleveToken) {
+    return res.json({ result: false, message: "Données manquantes" });
+  }
+  const coach = await Coach.findOne({ token: coachToken });
+  if (!coach) {
+    return res.status(404).json({ result: false, message: "Coach non trouvé" });
+  }
+  const eleve = await Eleve.findOne({ token: eleveToken });
+  if (!eleve) {
+    return res.status(404).json({ result: false, message: "Élève non trouvé" });
+  }
+  // Vérifier si l'élève est déjà ajouté
+  if (!coach.eleves.includes(eleve._id)) {
+    coach.eleves.push(eleve._id);
+    await coach.save();
+  }
+  // Mettre à jour l'élève avec l'ID du coach
+  eleve.coach = coach._id;
+  await eleve.save();
 
-  if (!coachId || !eleveId) {
+  res.json({ result: true, message: "Élève ajouté avec succès", eleve });
+});
+
+router.delete("/eleve", async (req, res) => {
+  const { coachToken, eleveToken } = req.body;
+  if (!coachToken || !eleveToken) {
     return res.json({ result: false, message: "Données manquantes" });
   }
 
-  Coach.findById(coachId)
-    .then((coach) => {
-      if (!coach) {
-        return res.status(404).json({
-          result: false,
-          message: "Coach non trouvé",
-        });
-      }
+  const coach = await Coach.findOne({ token: coachToken });
+  if (!coach) {
+    return res.status(404).json({ result: false, message: "Coach non trouvé" });
+  }
+  const eleve = await Eleve.findOne({ token: eleveToken });
+  if (!eleve) {
+    return res.status(404).json({ result: false, message: "Élève non trouvé" });
+  }
+  coach.eleves = coach.eleves.filter(
+    (id) => id.toString() !== eleve.id.toString()
+  );
+  await coach.save();
 
-      if (!coach.eleves.includes(eleveId)) {
-        coach.eleves.push(eleveId);
-        return coach.save();
-      }
-      return coach;
-    })
-    .then(() => {
-      return Eleve.findByIdAndUpdate(eleveId, { coach: coachId });
-    })
-    .then((eleve) => {
-      if (!eleve) {
-        return res.json({ result: false, message: "Élève non trouvé" });
-      }
-      res.json({ result: true, message: "Élève ajouté avec succès", eleve });
-    });
+  eleve.coach = null;
+  await eleve.save();
+
+  res.json({ result: true, message: "elève supprimé avec succès" });
 });
 module.exports = router;
