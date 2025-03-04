@@ -24,11 +24,11 @@ router.post("/addEleve", async (req, res) => {
   }
   const coach = await Coach.findOne({ token: coachToken });
   if (!coach) {
-    return res.status(404).json({ result: false, message: "Coach non trouvé" });
+    return res.json({ result: false, message: "Coach non trouvé" });
   }
   const eleve = await Eleve.findOne({ token: eleveToken });
   if (!eleve) {
-    return res.status(404).json({ result: false, message: "Élève non trouvé" });
+    return res.json({ result: false, message: "Élève non trouvé" });
   }
   // Vérifier si l'élève est déjà ajouté
   if (!coach.eleves.includes(eleve._id)) {
@@ -50,11 +50,11 @@ router.delete("/eleve", async (req, res) => {
 
   const coach = await Coach.findOne({ token: coachToken });
   if (!coach) {
-    return res.status(404).json({ result: false, message: "Coach non trouvé" });
+    return res.json({ result: false, message: "Coach non trouvé" });
   }
   const eleve = await Eleve.findOne({ token: eleveToken });
   if (!eleve) {
-    return res.status(404).json({ result: false, message: "Élève non trouvé" });
+    return res.json({ result: false, message: "Élève non trouvé" });
   }
   coach.eleves = coach.eleves.filter(
     (id) => id.toString() !== eleve.id.toString()
