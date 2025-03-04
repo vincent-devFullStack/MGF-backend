@@ -74,7 +74,7 @@ router.post("/signinEleve", (req, res) => {
   }
   Eleve.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, message: "You are connected" });
+      res.json({ result: true, data: data });
     } else {
       res.json({ result: false, error: "User not found or wrong password" });
     }
@@ -143,7 +143,7 @@ router.post("/signinCoach", (req, res) => {
   }
   Coach.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
     if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, message: "You are connected" });
+      res.json({ result: true, data: data });
     } else {
       res.json({ result: false, error: "User not found or wrong password" });
     }
