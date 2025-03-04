@@ -14,8 +14,23 @@ router.get("/", function (req, res) {
   res.render("index", { title: "Express" });
 });
 
+//CheckEmail
+router.post("/checkEmail", async (req, res) => {
+  if (!checkBody(req.body, ["email"])) {
+    res.json({ result: false, error: "Missing email" });
+  }
+  const existingEmail = await Eleve.findOne({
+    email: req.body.email.toLowerCase(),
+  });
+  if (existingEmail) {
+    res.json({ result: true, message: "Email already used" });
+  } else {
+    res.json({ result: false, message: "You can use this email" });
+  }
+});
+
 //Register new "eleve"
-router.post("/signupEleve", (req, res) => {
+router.post("/signupEleve", async (req, res) => {
   if (
     !checkBody(req.body, [
       "name",
@@ -35,7 +50,7 @@ router.post("/signupEleve", (req, res) => {
   }
 
   //Check if the user has not already been registered
-  Eleve.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
+  await Eleve.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
