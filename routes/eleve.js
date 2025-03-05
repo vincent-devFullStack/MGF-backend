@@ -52,6 +52,37 @@ router.post("/chat", async (req, res) => {
   res.json({ result: true, message: "Message was sent!" });
 });
 
+/* Delete message tchat */
+router.post("/delete-message", async (req, res) => {
+  if (!checkBody(req.body, ["token", "texte"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  const eleve = await Eleve.findOne({ token: req.body.token });
+  if (!eleve) {
+    return res.json({ result: false, message: "Student not found" });
+  }
+
+  const newEleve = await eleve.conversations.filter(
+    (e) => e.texte !== req.body.texte
+  );
+
+  const conversationsUpdate = await Eleve.findOneAndUpdate(
+    { token: req.body.token },
+    {
+      conversations: newEleve,
+    },
+    { new: true }
+  );
+
+  if (!conversationsUpdate) {
+    return res.json({ error: "Message wasn't deleted!" });
+  }
+
+  res.json({ result: true, message: "Message was deleted!" });
+});
+
 /* Ajout premières mesures */
 router.post("/first-mesures", async (req, res) => {
   if (
@@ -279,7 +310,7 @@ router.post("/first-photos", async (req, res) => {
     {
       "photos.depart.front": req.body.front,
       "photos.depart.back": req.body.back,
-      "photos.depart.front": req.body.profil,
+      "photos.depart.profil": req.body.profil,
     },
     { new: true }
   );
@@ -303,7 +334,7 @@ router.post("/photos", async (req, res) => {
     {
       "photos.actuelles.front": req.body.front,
       "photos.actuelles.back": req.body.back,
-      "photos.actuelles.front": req.body.profil,
+      "photos.actuelles.profil": req.body.profil,
     },
     { new: true }
   );
@@ -313,6 +344,42 @@ router.post("/photos", async (req, res) => {
   }
 
   res.json({ result: true, message: "Pictures were added!" });
+});
+
+/* Ajout programme*/
+router.post("/programme", async (req, res) => {
+  if (!checkBody(req.body, ["email", "id"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+  const programmeEleve = await Eleve.updateOne(
+    { email: req.body.email },
+    { programmes: req.body.id }
+  );
+
+  if (!programmeEleve) {
+    return res.json({ error: "Programme wasn't added!" });
+  }
+
+  res.json({ result: true, message: "Programme was added!" });
+});
+
+/* Delete programme*/
+router.delete("/programme", async (req, res) => {
+  if (!checkBody(req.body, ["email"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+  const deleteProgramme = await Eleve.updateOne(
+    { email: req.body.email },
+    { programmes: null }
+  );
+
+  if (!deleteProgramme) {
+    return res.json({ error: "Programme wasn't deleted!" });
+  }
+
+  res.json({ result: true, message: "Programme was deleted!" });
 });
 
 module.exports = router;
