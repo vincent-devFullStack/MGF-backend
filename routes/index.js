@@ -6,6 +6,10 @@ const Eleve = require("../models/eleves");
 const Coach = require("../models/coachs");
 const { checkBody } = require("../modules/CheckBody");
 
+const uniqid = require("uniqid");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
@@ -165,6 +169,7 @@ router.post("/signinCoach", (req, res) => {
 
 /* Upload photo */
 router.post("/upload", async (req, res) => {
+  console.log(req.files.photoFromFront);
   const photoPath = `./tmp/${uniqid()}.jpg`;
   const resultMove = await req.files.photoFromFront.mv(photoPath);
 
@@ -175,7 +180,10 @@ router.post("/upload", async (req, res) => {
 
     res.json({
       result: true,
-      url: cloudinary.url(resultCloudinary.secure_url),
+      url: cloudinary.url(resultCloudinary.secure_url, {
+        width: 200,
+        aspect_ratio: "1/1",
+      }),
     });
   } else {
     res.json({ result: false, error: resultMove });
