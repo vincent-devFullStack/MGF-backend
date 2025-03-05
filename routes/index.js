@@ -139,10 +139,11 @@ router.post("/signupCoach", (req, res) => {
         lieux: req.body.lieux,
         domaineExpertise: req.body.domaineExpertise,
         abonnement: false,
+        presentation: req.body.presentation,
       });
 
       newCoach.save().then((newDoc) => {
-        res.json({ result: true, token: newDoc.token });
+        res.json({ result: true, data: newDoc });
       });
     } else {
       //User already exists in database
