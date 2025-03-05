@@ -163,4 +163,46 @@ router.post("/signinCoach", (req, res) => {
   });
 });
 
+/* Upload photo */
+router.post("/upload", async (req, res) => {
+  const photoPath = `./tmp/${uniqid()}.jpg`;
+  const resultMove = await req.files.photoFromFront.mv(photoPath);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+
+    fs.unlinkSync(photoPath);
+
+    res.json({
+      result: true,
+      url: cloudinary.url(resultCloudinary.secure_url),
+    });
+  } else {
+    res.json({ result: false, error: resultMove });
+  }
+});
+
+/* Upload video */
+router.post("/upload-videos", async (req, res) => {
+  const videoPath = `./tmp/${uniqid()}.mp4`;
+  const resultMove = await req.files.videoFromFront.mv(videoPath);
+
+  if (!resultMove) {
+    const resultCloudinary = await cloudinary.uploader.upload(videoPath, {
+      resource_type: "video",
+    });
+
+    fs.unlinkSync(videoPath);
+
+    res.json({
+      result: true,
+      url: cloudinary.url(resultCloudinary.secure_url, {
+        resource_type: "video",
+      }),
+    });
+  } else {
+    res.json({ result: false, error: resultMove });
+  }
+});
+
 module.exports = router;

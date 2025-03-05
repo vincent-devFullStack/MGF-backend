@@ -53,25 +53,6 @@ router.post("/new", async (req, res) => {
   res.json({ result: true, data: addProgramme });
 });
 
-/* Upload photo */
-router.post("/upload", async (req, res) => {
-  const photoPath = `./tmp/${uniqid()}.jpg`;
-  const resultMove = await req.files.photoFromFront.mv(photoPath);
-
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-
-    fs.unlinkSync(photoPath);
-
-    res.json({
-      result: true,
-      url: cloudinary.url(resultCloudinary.secure_url),
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
-  }
-});
-
 /* update programme */
 router.post("/update", async (req, res) => {
   const updateProg = await Programme.updateOne(
