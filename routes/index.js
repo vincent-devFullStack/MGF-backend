@@ -83,7 +83,7 @@ router.post("/signupEleve", async (req, res) => {
   });
 });
 
-//connect to user
+//connect to élève
 router.post("/signinEleve", (req, res) => {
   if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -94,6 +94,22 @@ router.post("/signinEleve", (req, res) => {
       res.json({ result: true, data: data });
     } else {
       res.json({ result: false, error: "User not found or wrong password" });
+    }
+  });
+});
+
+//Delete user élève
+router.delete("/deleteEleve", (req, res) => {
+  if (!checkBody(req.body, ["email"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  Eleve.deleteOne({ email: req.body.email.toLowerCase() }).then((data) => {
+    if (data.deletedCount === 1) {
+      res.json({ result: true, message: "User deleted" });
+    } else {
+      res.json({ result: false, error: "User not found" });
     }
   });
 });
@@ -164,6 +180,22 @@ router.post("/signinCoach", (req, res) => {
       res.json({ result: true, data: data });
     } else {
       res.json({ result: false, error: "User not found or wrong password" });
+    }
+  });
+});
+
+//Delete user coach
+router.delete("/deleteCoach", (req, res) => {
+  if (!checkBody(req.body, ["email"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  Coach.deleteOne({ email: req.body.email.toLowerCase() }).then((data) => {
+    if (data.deletedCount === 1) {
+      res.json({ result: true, message: "User deleted" });
+    } else {
+      res.json({ result: false, error: "User not found" });
     }
   });
 });
