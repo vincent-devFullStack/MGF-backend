@@ -73,7 +73,7 @@ router.post("/signupEleve", async (req, res) => {
       });
 
       newEleve.save().then((newDoc) => {
-        res.json({ result: true, token: newDoc.token });
+        res.json({ result: true, data: newDoc });
       });
     } else {
       //User already exists in database
