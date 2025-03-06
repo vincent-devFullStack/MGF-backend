@@ -205,7 +205,13 @@ const eleveSchema = mongoose.Schema({
     },
   ],
 
-  rdv: Date,
+  rdv: [
+    {
+      date: Date,
+      heure: String,
+      coach: { type: mongoose.Schema.Types.ObjectId, ref: "coachs" },
+    },
+  ],
 });
 
 const Eleve = mongoose.model("eleves", eleveSchema);

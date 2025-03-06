@@ -24,6 +24,13 @@ const coachSchema = mongoose.Schema({
     debut: Date,
     fin: Date,
   },
+  rdv: [
+    {
+      date: Date,
+      heure: String,
+      eleve: { type: mongoose.Schema.Types.ObjectId, ref: "eleves" },
+    },
+  ],
 });
 
 const Coach = mongoose.model("coachs", coachSchema);
