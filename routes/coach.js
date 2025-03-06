@@ -1,4 +1,5 @@
 var express = require("express");
+
 const Coach = require("../models/coachs");
 const Eleve = require("../models/eleves");
 var router = express.Router();
@@ -16,6 +17,12 @@ router.get("/:token", async (req, res) => {
     return res.json({ error: "Coach non trouvé" });
   }
   res.json({ result: true, eleves: coach.eleves });
+});
+
+router.get("/", (req, res) => {
+  Coach.find().then((data) => {
+    res.json(data);
+  });
 });
 
 router.post("/addEleve", async (req, res) => {
