@@ -1,16 +1,25 @@
 var express = require("express");
 var router = express.Router();
-const { checkBody } = require("../modules/CheckBody");
-
-const uniqid = require("uniqid");
+const { checkBody } = require("../modules/checkBody");
 
 const Programme = require("../models/programmes");
+const Coach = require("../models/coachs");
 
-/* Get programmes */
-router.get("/", async (req, res) => {
-  const programmes = await Programme.find();
+/* Get programme by coach */
+router.get("/:token", async (req, res) => {
+  const token = req.params.token;
 
-  res.json({ programmes });
+  if (!token) {
+    return res.json({ error: "Token required" });
+  }
+
+  const coach = await Coach.findOne({ token }).populate("programmes");
+
+  if (!coach) {
+    return res.json({ error: "Coach not found" });
+  }
+
+  res.json({ result: true, programmes: coach.programmes });
 });
 
 /* Add new programme */
@@ -23,6 +32,7 @@ router.post("/new", async (req, res) => {
       "description",
       "photo",
       "exercices",
+      "coachToken",
     ])
   ) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -50,6 +60,10 @@ router.post("/new", async (req, res) => {
     return res.json({ error: "Programme wasn't created" });
   }
 
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+  coach.programmes.push(addProgramme._id);
+  await coach.save();
+
   res.json({ result: true, data: addProgramme });
 });
 
@@ -68,14 +82,25 @@ router.post("/update", async (req, res) => {
 });
 
 /* delete programme */
-router.delete("/:name", async (req, res) => {
+router.post("/delete", async (req, res) => {
+  if (!checkBody(req.body, ["name", "coachToken"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
   const programmeDelete = await Programme.deleteOne({
-    name: { $regex: new RegExp(req.params.name, "i") },
+    name: { $regex: new RegExp(req.body.name, "i") },
   });
 
   if (!programmeDelete) {
     return res.json({ error: "Programme wasn't found" });
   }
+
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+  coach.programmes = coach.programmes.filter(
+    (prog) => prog.name !== req.body.name
+  );
+  await coach.save();
 
   res.json({ result: true, message: "Programme was deleted" });
 });

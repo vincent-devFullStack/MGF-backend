@@ -1,19 +1,25 @@
 var express = require("express");
 var router = express.Router();
-const { checkBody } = require("../modules/CheckBody");
-
-const uniqid = require("uniqid");
-
-const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
+const { checkBody } = require("../modules/checkBody");
 
 const Exercice = require("../models/exercices");
+const Coach = require("../models/coachs");
 
-/* Get exercices */
-router.get("/", async (req, res) => {
-  const exercices = await Exercice.find();
+/* Get exercices by coach */
+router.get("/:token", async (req, res) => {
+  const token = req.params.token;
 
-  res.json({ exercices });
+  if (!token) {
+    return res.json({ error: "Token required" });
+  }
+
+  const coach = await Coach.findOne({ token }).populate("exercices");
+
+  if (!coach) {
+    return res.json({ error: "Coach not found" });
+  }
+
+  res.json({ result: true, exercices: coach.exercices });
 });
 
 /* Add new exercice */
@@ -27,6 +33,7 @@ router.post("/new", async (req, res) => {
       "ciblage",
       "utilisationMuscle",
       "categorie",
+      "coachToken",
     ])
   ) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -55,6 +62,10 @@ router.post("/new", async (req, res) => {
     return res.json({ error: "Exercice wasn't created" });
   }
 
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+  coach.exercices.push(addExercice._id);
+  await coach.save();
+
   res.json({ result: true, data: addExercice });
 });
 
@@ -73,14 +84,22 @@ router.post("/update", async (req, res) => {
 });
 
 /* delete exercice */
-router.delete("/:name", async (req, res) => {
+router.post("/delete", async (req, res) => {
+  if (!checkBody(req.body, ["name", "coachToken"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
   const exerciceDelete = await Exercice.deleteOne({
-    name: { $regex: new RegExp(req.params.name, "i") },
+    name: { $regex: new RegExp(req.body.name, "i") },
   });
 
   if (!exerciceDelete) {
     return res.json({ error: "Exercice wasn't found" });
   }
+
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+  coach.exercices = coach.exercices.filter((exo) => exo.name !== req.body.name);
+  await coach.save();
 
   res.json({ result: true, message: "Exercice was deleted" });
 });
