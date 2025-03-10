@@ -89,15 +89,20 @@ router.post("/delete", async (req, res) => {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
+
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+  if (!coach) {
+    return res.json({ result: false, error: "Coach not found" });
+  }
+
   const exerciceDelete = await Exercice.deleteOne({
     name: { $regex: new RegExp(req.body.name, "i") },
   });
 
-  if (!exerciceDelete) {
+  if (exerciceDelete.deletedCount === 0) {
     return res.json({ error: "Exercice wasn't found" });
   }
 
-  const coach = await Coach.findOne({ token: req.body.coachToken });
   coach.exercices = coach.exercices.filter((exo) => exo.name !== req.body.name);
   await coach.save();
 
