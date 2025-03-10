@@ -3,7 +3,7 @@ var express = require("express");
 const Coach = require("../models/coachs");
 const Eleve = require("../models/eleves");
 var router = express.Router();
-const checkBody = require("../modules/checkBody.js");
+const checkBody = require("../modules/checkBody");
 
 /* GET users listing. */
 router.get("/:token", async (req, res) => {
