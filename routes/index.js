@@ -89,13 +89,20 @@ router.post("/signinEleve", (req, res) => {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  Eleve.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
-    if (data && bcrypt.compareSync(req.body.password, data.password)) {
-      res.json({ result: true, data: data });
-    } else {
-      res.json({ result: false, error: "User not found or wrong password" });
-    }
-  });
+  Eleve.findOne({ email: req.body.email.toLowerCase() })
+    .then((data) => {
+      if (data && bcrypt.compareSync(req.body.password, data.password)) {
+        res.json({ result: true, data: data });
+      } else {
+        res.json({ result: false, error: "User not found or wrong password" });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ result: false, error: "Internal server error" });
+    });
 });
 
 //Delete user élève
