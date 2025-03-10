@@ -88,15 +88,20 @@ router.post("/delete", async (req, res) => {
     return;
   }
 
+  const coach = await Coach.findOne({ token: req.body.coachToken });
+
+  if (!coach) {
+    return res.json({ result: false, error: "Coach not found" });
+  }
+
   const programmeDelete = await Programme.deleteOne({
     name: { $regex: new RegExp(req.body.name, "i") },
   });
 
-  if (!programmeDelete) {
-    return res.json({ error: "Programme wasn't found" });
+  if (programmeDelete.deletedCount === 0) {
+    return res.json({ result: false, error: "Programme wasn't found" });
   }
 
-  const coach = await Coach.findOne({ token: req.body.coachToken });
   coach.programmes = coach.programmes.filter(
     (prog) => prog.name !== req.body.name
   );
