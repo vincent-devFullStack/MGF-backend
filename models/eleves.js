@@ -15,7 +15,7 @@ const eleveSchema = mongoose.Schema({
   morphorlogie: String,
   coach: { type: mongoose.Schema.Types.ObjectId, ref: "coachs" },
   programmes: { type: mongoose.Schema.Types.ObjectId, ref: "programmes" },
-  photoProfil: String,
+  photoProfil: null || String,
   abonnement: {
     actif: Boolean,
     type: String,
@@ -24,14 +24,14 @@ const eleveSchema = mongoose.Schema({
   },
   photos: {
     depart: {
-      front: String,
-      back: String,
-      profil: String,
+      front: null || String,
+      back: null || String,
+      profil: null || String,
     },
     actuelles: {
-      front: String,
-      back: String,
-      profil: String,
+      front: null || String,
+      back: null || String,
+      profil: null || String,
     },
   },
   bodyDepart: {
