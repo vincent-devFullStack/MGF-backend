@@ -14,7 +14,11 @@ router.get("/:token", async (req, res) => {
     return res.json({ error: "Token required" });
   }
 
-  const eleve = await Eleve.findOne({ token: token }).populate("coach");
+  const eleve = await Eleve.findOne({ token: token })
+    .populate("coach")
+    .populate("conversations")
+    .populate("programmes")
+    .populate("historique.exercices.exercice");
 
   if (!eleve) {
     return res.json({ error: "Student not found!" });
