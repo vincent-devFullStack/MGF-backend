@@ -4,7 +4,7 @@ var router = express.Router();
 require("../models/connection");
 const Eleve = require("../models/eleves");
 const Coach = require("../models/coachs");
-const { checkBody } = require("../modules/checkBody");
+const checkBody = require("../modules/checkBody.js");
 
 const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
