@@ -18,6 +18,7 @@
     "mongoose": "^8.11.0",
     "morgan": "~1.9.1",
     "nodemon": "^3.1.9",
+    "serve-favicon": "^2.5.0",
     "uid2": "^1.0.0",
     "uniqid": "^5.4.0"
   }
