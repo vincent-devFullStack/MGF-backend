@@ -57,34 +57,26 @@ router.post("/chat", async (req, res) => {
 });
 
 /* Delete message tchat */
-router.post("/delete-message", async (req, res) => {
-  if (!checkBody(req.body, ["token", "texte"])) {
-    res.json({ result: false, error: "Missing or empty fields" });
-    return;
+router.delete("/delete-message", async (req, res) => {
+  const { token, texte } = req.body;
+
+  if (!token || !texte) {
+    return res.json({ result: false, error: "Missing or empty fields" });
   }
 
-  const eleve = await Eleve.findOne({ token: req.body.token });
+  const eleve = await Eleve.findOne({ token });
+
   if (!eleve) {
-    return res.json({ result: false, message: "Student not found" });
+    return res.json({ result: false, error: "Student not found" });
   }
 
-  const newEleve = await eleve.conversations.filter(
-    (e) => e.texte !== req.body.texte
+  eleve.conversations = eleve.conversations.filter(
+    (msg) => msg.texte !== texte
   );
 
-  const conversationsUpdate = await Eleve.findOneAndUpdate(
-    { token: req.body.token },
-    {
-      conversations: newEleve,
-    },
-    { new: true }
-  );
+  await eleve.save();
 
-  if (!conversationsUpdate) {
-    return res.json({ error: "Message wasn't deleted!" });
-  }
-
-  res.json({ result: true, message: "Message was deleted!" });
+  res.json({ result: true, message: "Message deleted successfully" });
 });
 
 /* Ajout premières mesures */
