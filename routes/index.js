@@ -40,6 +40,7 @@ router.post("/signupEleve", async (req, res) => {
       "firstname",
       "email",
       "password",
+      "secretWord",
       "role",
       "objectif",
       "sexe",
@@ -56,12 +57,14 @@ router.post("/signupEleve", async (req, res) => {
   await Eleve.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
+      const hashSecretWord = bcrypt.hashSync(req.body.secretWord, 10);
 
       const newEleve = new Eleve({
         name: req.body.name,
         firstname: req.body.firstname,
         email: req.body.email.toLowerCase(),
         password: hash,
+        secretWord: hashSecretWord,
         token: uid2(32),
         role: req.body.role,
         objectif: req.body.objectif,
@@ -128,6 +131,7 @@ router.post("/signupCoach", (req, res) => {
       "firstname",
       "email",
       "password",
+      "secretWord",
       "role",
       "photoProfil",
       "diplomes",
@@ -146,12 +150,14 @@ router.post("/signupCoach", (req, res) => {
   Coach.findOne({ email: req.body.email.toLowerCase() }).then((data) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
+      const hashSecretWord = bcrypt.hashSync(req.body.secretWord, 10);
 
       const newCoach = new Coach({
         name: req.body.name,
         firstname: req.body.firstname,
         email: req.body.email.toLowerCase(),
         password: hash,
+        secretWord: hashSecretWord,
         token: uid2(32),
         photoProfil: req.body.photoProfil,
         role: req.body.role,
