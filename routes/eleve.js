@@ -360,6 +360,25 @@ router.post("/programme", async (req, res) => {
   res.json({ result: true, message: "Programme was added!" });
 });
 
+/* Récupérer les rdv de l'élève */
+router.get("/rdv/:token", async (req, res) => {
+  const token = req.params.token;
+  if (!token) {
+    return res.json({ result: false, message: "Token requis" });
+  }
+
+  const eleve = await Eleve.findOne({ token: token })
+    .populate({
+      path: "rdv",
+      populate: { path: "eleve" },
+    })
+    .populate("programmes");
+  if (!eleve) {
+    return res.json({ result: false, message: "Eleve non trouvé" });
+  }
+  res.json({ result: true, rdv: eleve.rdv, programmes: eleve.programmes });
+});
+
 /* Delete programme*/
 router.delete("/programme", async (req, res) => {
   if (!checkBody(req.body, ["email"])) {
@@ -376,6 +395,21 @@ router.delete("/programme", async (req, res) => {
   }
 
   res.json({ result: true, message: "Programme was deleted!" });
+});
+
+/* Delete compte*/
+router.delete("/deleteAccount", async (req, res) => {
+  if (!checkBody(req.body, ["eleveToken"])) {
+    res.json({ result: false, error: "Donnée manquante" });
+    return;
+  }
+  const deleteAccount = await Eleve.deleteOne({ token: req.body.eleveToken });
+
+  if (!deleteAccount) {
+    return res.json({ error: "Account wasn't deleted!" });
+  }
+
+  res.json({ result: true, message: "Account was deleted!" });
 });
 
 module.exports = router;

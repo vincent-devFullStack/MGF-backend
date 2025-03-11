@@ -159,4 +159,19 @@ router.post("/rdv/delete", async (req, res) => {
 
   res.json({ result: true, message: "Rendez-vous supprimé avec succès" });
 });
+
+/* Supprimer compte*/
+router.delete("/deleteAccount", async (req, res) => {
+  if (!checkBody(req.body, ["coachToken"])) {
+    res.json({ result: false, error: "Donnée manquante" });
+    return;
+  }
+  const deleteAccount = await Coach.deleteOne({ token: req.body.coachToken });
+
+  if (!deleteAccount) {
+    return res.json({ error: "Account wasn't deleted!" });
+  }
+
+  res.json({ result: true, message: "Account was deleted!" });
+});
 module.exports = router;
