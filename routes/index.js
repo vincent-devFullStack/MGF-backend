@@ -4,6 +4,7 @@ var router = express.Router();
 const Eleve = require("../models/eleves");
 const Coach = require("../models/coachs");
 const { checkBody } = require("../modules/checkBody");
+const jwt = require("jsonwebtoken");
 
 const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
@@ -249,6 +250,50 @@ router.post("/upload-videos", async (req, res) => {
     });
   } else {
     res.json({ result: false, error: resultMove });
+  }
+});
+
+/* Reset Password */
+
+router.post("/password-reset", async (req, res) => {
+  const email = req.body.email.toLowerCase(); // ✅ Correction ici
+
+  try {
+    let user = await Coach.findOne({ email });
+    if (!user) {
+      user = await Eleve.findOne({ email });
+    }
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "Aucun compte trouvé avec cet email" });
+    }
+
+    // Générer un token temporaire
+    const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // Envoi de l'email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Réinitialisation de mot de passe",
+      html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p> Service en maintenance`,
+    });
+
+    res.json({
+      message: "Un email a été envoyé avec un lien de réinitialisation.",
+    });
+  } catch (error) {
+    console.error("Erreur serveur :", error); // ✅ Log complet de l'erreur
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
