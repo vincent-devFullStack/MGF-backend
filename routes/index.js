@@ -4,7 +4,6 @@ var router = express.Router();
 const Eleve = require("../models/eleves");
 const Coach = require("../models/coachs");
 const { checkBody } = require("../modules/checkBody");
-const jwt = require("jsonwebtoken");
 
 const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
@@ -256,26 +255,34 @@ router.post("/upload-videos", async (req, res) => {
 /* Reset Password */
 
 router.post("/password-reset", async (req, res) => {
-  const email = req.body.email.toLowerCase(); // ✅ Correction ici
+  const { email, secretWord } = req.body;
 
   try {
-    let user = await Coach.findOne({ email });
+    if (!email || !secretWord) {
+      return res.status(400).json({ error: "Email et secretWord requis." });
+    }
+
+    const lowerEmail = email.toLowerCase();
+
+    let user = await Coach.findOne({ email: lowerEmail });
+    let userType = "coach";
+
     if (!user) {
-      user = await Eleve.findOne({ email });
+      user = await Eleve.findOne({ email: lowerEmail });
+      userType = "eleve";
     }
 
     if (!user) {
       return res
         .status(404)
-        .json({ error: "Aucun compte trouvé avec cet email" });
+        .json({ error: "Aucun compte trouvé avec cet email." });
     }
 
-    // Générer un token temporaire
-    const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Vérification du secretWord hashé
+    if (!user.secretWord || !bcrypt.compareSync(secretWord, user.secretWord)) {
+      return res.status(401).json({ error: "SecretWord incorrect." });
+    }
 
-    // Envoi de l'email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
@@ -283,16 +290,16 @@ router.post("/password-reset", async (req, res) => {
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: lowerEmail,
       subject: "Réinitialisation de mot de passe",
-      html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p> Service en maintenance`,
+      html: "<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p> <a href=https://ton-site.com/reset-password?token=${resetToken}>Réinitialiser mon mot de passe</a>",
     });
 
     res.json({
       message: "Un email a été envoyé avec un lien de réinitialisation.",
     });
   } catch (error) {
-    console.error("Erreur serveur :", error); // ✅ Log complet de l'erreur
+    console.error("Erreur serveur :", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });

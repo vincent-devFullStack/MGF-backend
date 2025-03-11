@@ -6,6 +6,7 @@ const eleveSchema = mongoose.Schema({
   email: String,
   password: String,
   token: String,
+  secretWord: String,
   sexe: String,
   taille: Number,
   poids: Number,

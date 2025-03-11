@@ -6,6 +6,7 @@ const coachSchema = mongoose.Schema({
   email: String,
   password: String,
   token: String,
+  secretWord: String,
   photoProfil: String,
   role: String,
   siret: Number,
