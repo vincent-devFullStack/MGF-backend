@@ -8,8 +8,14 @@ const programmeSchema = mongoose.mongoose.Schema({
   seances: Number,
   exercices: [
     [
-      { type: mongoose.Schema.Types.ObjectId, ref: "exercices" },
-      { series: Number, repetitions: Number },
+      [
+        {
+          exercice: { type: mongoose.Schema.Types.ObjectId, ref: "exercices" },
+          series: Number,
+          repetitions: Number,
+          name: String,
+        },
+      ],
     ],
   ],
 });

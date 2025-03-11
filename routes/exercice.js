@@ -22,6 +22,28 @@ router.get("/:token", async (req, res) => {
   res.json({ result: true, exercices: coach.exercices });
 });
 
+/* Search exercices */
+router.get("/search/:query", async (req, res) => {
+  const response = await Exercice.find({
+    name: { $regex: new RegExp(req.params.query, "i") },
+  });
+
+  const data = response.map((exo) => {
+    return {
+      id: exo.id,
+      name: exo.name,
+      description: exo.description,
+      photo: exo.photo,
+      video: exo.video,
+      ciblage: exo.ciblage,
+      utilisationMuscle: exo.utilisationMuscle,
+      categorie: exo.categorie,
+    };
+  });
+
+  res.json({ result: true, data: data });
+});
+
 /* Add new exercice */
 router.post("/new", async (req, res) => {
   if (
