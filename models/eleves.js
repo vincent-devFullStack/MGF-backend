@@ -36,6 +36,7 @@ const eleveSchema = mongoose.Schema({
     },
   },
   bodyDepart: {
+    poids: Number,
     cou: Number,
     poitrine: Number,
     biceps: Number,
@@ -45,6 +46,7 @@ const eleveSchema = mongoose.Schema({
     mollet: Number,
   },
   bodyActuel: {
+    poids: Number,
     cou: Number,
     poitrine: Number,
     biceps: Number,
