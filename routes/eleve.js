@@ -91,6 +91,7 @@ router.post("/first-mesures", async (req, res) => {
       "hanche",
       "cuisse",
       "mollet",
+      "poids",
     ])
   ) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -101,6 +102,7 @@ router.post("/first-mesures", async (req, res) => {
     { token: req.body.token },
     {
       bodyDepart: {
+        poids: req.body.poids,
         cou: req.body.cou,
         poitrine: req.body.poitrine,
         biceps: req.body.biceps,
@@ -132,6 +134,7 @@ router.post("/mesures", async (req, res) => {
       "hanche",
       "cuisse",
       "mollet",
+      "poids",
     ])
   ) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -142,6 +145,7 @@ router.post("/mesures", async (req, res) => {
     { token: req.body.token },
     {
       bodyActuel: {
+        poids: req.body.poids,
         cou: req.body.cou,
         poitrine: req.body.poitrine,
         biceps: req.body.biceps,

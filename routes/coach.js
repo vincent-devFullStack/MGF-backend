@@ -26,15 +26,15 @@ router.get("/", (req, res) => {
 });
 
 router.post("/addEleve", async (req, res) => {
-  const { coachToken, eleveToken } = req.body;
-  if (!coachToken || !eleveToken) {
+  const { coachToken, eleveEmail } = req.body;
+  if (!coachToken || !eleveEmail) {
     return res.json({ result: false, message: "Données manquantes" });
   }
   const coach = await Coach.findOne({ token: coachToken });
   if (!coach) {
     return res.json({ result: false, message: "Coach non trouvé" });
   }
-  const eleve = await Eleve.findOne({ token: eleveToken });
+  const eleve = await Eleve.findOne({ email: eleveEmail.toLowerCase() });
   if (!eleve) {
     return res.json({ result: false, message: "Élève non trouvé" });
   }
@@ -47,7 +47,7 @@ router.post("/addEleve", async (req, res) => {
   eleve.coach = coach._id;
   await eleve.save();
 
-  res.json({ result: true, message: "Élève ajouté avec succès", eleve });
+  res.json({ result: true, message: "Élève ajouté avec succès" });
 });
 
 router.delete("/eleve", async (req, res) => {

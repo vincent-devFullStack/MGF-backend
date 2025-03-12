@@ -215,47 +215,63 @@ router.delete("/deleteCoach", (req, res) => {
 
 /* Upload photo */
 router.post("/upload", async (req, res) => {
-  console.log(req.files.photoFromFront);
-  const photoPath = `./tmp/${uniqid()}.jpg`;
-  const resultMove = await req.files.photoFromFront.mv(photoPath);
+  try {
+    if (!req.files || !req.files.photoFromFront) {
+      return res
+        .status(400)
+        .json({ result: false, error: "No photo file uploaded" });
+    }
+    const photoPath = `./tmp/${uniqid()}.jpg`;
+    const resultMove = await req.files.photoFromFront.mv(photoPath);
 
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+    if (!resultMove) {
+      const resultCloudinary = await cloudinary.uploader.upload(photoPath);
 
-    fs.unlinkSync(photoPath);
+      fs.unlink(photoPath, (err) => {
+        if (err) console.error("Error deleting temp file:", err);
+      });
 
-    res.json({
-      result: true,
-      url: cloudinary.url(resultCloudinary.secure_url, {
-        width: 200,
-        aspect_ratio: "1/1",
-      }),
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
+      res.json({
+        result: true,
+        url: resultCloudinary.secure_url,
+      });
+    }
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ result: false, error: error.message });
   }
 });
 
 /* Upload video */
 router.post("/upload-videos", async (req, res) => {
-  const videoPath = `./tmp/${uniqid()}.mp4`;
-  const resultMove = await req.files.videoFromFront.mv(videoPath);
+  try {
+    if (!req.files || !req.files.videoFromFront) {
+      return res
+        .status(400)
+        .json({ result: false, error: "No video file uploaded" });
+    }
 
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(videoPath, {
-      resource_type: "video",
-    });
+    const videoPath = `./tmp/${uniqid()}.mp4`;
 
-    fs.unlinkSync(videoPath);
+    const resultMove = await req.files.videoFromFront.mv(videoPath);
 
-    res.json({
-      result: true,
-      url: cloudinary.url(resultCloudinary.secure_url, {
+    if (!resultMove) {
+      const resultCloudinary = await cloudinary.uploader.upload(videoPath, {
         resource_type: "video",
-      }),
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
+      });
+
+      fs.unlink(videoPath, (err) => {
+        if (err) console.error("Error deleting temp file:", err);
+      });
+
+      res.json({
+        result: true,
+        url: resultCloudinary.secure_url,
+      });
+    }
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ result: false, error: error.message });
   }
 });
 
