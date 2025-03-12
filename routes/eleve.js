@@ -370,7 +370,7 @@ router.get("/rdv/:token", async (req, res) => {
   const eleve = await Eleve.findOne({ token: token })
     .populate({
       path: "rdv",
-      populate: { path: "eleve" },
+      populate: [{ path: "eleve" }, { path: "coach" }],
     })
     .populate("programmes");
   if (!eleve) {
