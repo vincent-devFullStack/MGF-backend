@@ -377,7 +377,13 @@ router.get("/rdv/:token", async (req, res) => {
       path: "rdv",
       populate: [{ path: "eleve" }, { path: "coach" }],
     })
-    .populate("programmes");
+
+    .populate({
+      path: "programmes",
+      populate: {
+        path: "exercices.exercice",
+      },
+    });
   if (!eleve) {
     return res.json({ result: false, message: "Eleve non trouvé" });
   }
