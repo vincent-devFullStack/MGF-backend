@@ -205,6 +205,7 @@ const eleveSchema = mongoose.Schema({
       date: Date,
       firstname: String,
       texte: String,
+      role: String,
     },
   ],
 

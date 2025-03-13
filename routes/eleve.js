@@ -44,6 +44,7 @@ router.post("/chat", async (req, res) => {
           date: date,
           name: req.body.firstname,
           texte: req.body.texte,
+          role: req.body.role,
         },
       },
     }
