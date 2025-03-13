@@ -77,6 +77,7 @@ router.delete("/eleve", async (req, res) => {
 
 // ajout d'un nouveau rendez-vous
 router.post("/rdv", async (req, res) => {
+  console.log(req.body);
   if (!checkBody(req.body, ["coachToken", "eleveToken", "date", "heure"])) {
     return res.json({ result: false, message: "Données manquantes" });
   }
