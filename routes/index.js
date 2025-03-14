@@ -11,7 +11,7 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 
 const uid2 = require("uid2");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 /* GET home page. */
 router.get("/", function (req, res) {
