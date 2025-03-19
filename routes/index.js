@@ -4,7 +4,6 @@ var router = express.Router();
 const Eleve = require("../models/eleves");
 const Coach = require("../models/coachs");
 const { checkBody } = require("../modules/checkBody");
-const nodemailer = require("nodemailer");
 
 const uniqid = require("uniqid");
 const cloudinary = require("cloudinary").v2;
@@ -280,50 +279,29 @@ router.post("/upload-videos", async (req, res) => {
 router.post("/password-reset", async (req, res) => {
   const { email, secretWord } = req.body;
 
-  try {
-    if (!email || !secretWord) {
-      return res.status(400).json({ error: "Email et secretWord requis." });
-    }
+  if (!email || !secretWord) {
+    return res.status(400).json({ error: "Email et secretWord requis." });
+  }
 
-    const lowerEmail = email.toLowerCase();
+  const lowerEmail = email.toLowerCase();
 
-    let user = await Coach.findOne({ email: lowerEmail });
-    let userType = "coach";
+  let user = await Coach.findOne({ email: lowerEmail });
+  let userType = "coach";
 
-    if (!user) {
-      user = await Eleve.findOne({ email: lowerEmail });
-      userType = "eleve";
-    }
+  if (!user) {
+    user = await Eleve.findOne({ email: lowerEmail });
+    userType = "eleve";
+  }
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ error: "Aucun compte trouvé avec cet email." });
-    }
+  if (!user) {
+    return res
+      .status(404)
+      .json({ error: "Aucun compte trouvé avec cet email." });
+  }
 
-    // Vérification du secretWord hashé
-    if (!user.secretWord || !bcrypt.compareSync(secretWord, user.secretWord)) {
-      return res.status(401).json({ error: "SecretWord incorrect." });
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: lowerEmail,
-      subject: "Réinitialisation de mot de passe",
-      html: "<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p> <a href=https://ton-site.com/reset-password?token=${resetToken}>Réinitialiser mon mot de passe</a>",
-    });
-
-    res.json({
-      message: "Un email a été envoyé avec un lien de réinitialisation.",
-    });
-  } catch (error) {
-    console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur serveur" });
+  // Vérification du secretWord hashé
+  if (!user.secretWord || !bcrypt.compareSync(secretWord, user.secretWord)) {
+    return res.status(401).json({ error: "SecretWord incorrect." });
   }
 });
 
