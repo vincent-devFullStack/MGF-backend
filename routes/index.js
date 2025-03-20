@@ -12,11 +12,6 @@ const fs = require("fs");
 const uid2 = require("uid2");
 const bcrypt = require("bcryptjs");
 
-/* GET home page. */
-router.get("/", function (req, res) {
-  res.render("index", { title: "Express" });
-});
-
 //CheckEmail
 router.post("/checkEmail", async (req, res) => {
   if (!checkBody(req.body, ["email"])) {
@@ -107,22 +102,6 @@ router.post("/signinEleve", (req, res) => {
     });
 });
 
-//Delete user élève
-router.delete("/deleteEleve", (req, res) => {
-  if (!checkBody(req.body, ["email"])) {
-    res.json({ result: false, error: "Missing or empty fields" });
-    return;
-  }
-
-  Eleve.deleteOne({ email: req.body.email.toLowerCase() }).then((data) => {
-    if (data.deletedCount === 1) {
-      res.json({ result: true, message: "User deleted" });
-    } else {
-      res.json({ result: false, error: "User not found" });
-    }
-  });
-});
-
 //register new coach
 router.post("/signupCoach", (req, res) => {
   if (
@@ -192,22 +171,6 @@ router.post("/signinCoach", (req, res) => {
       res.json({ result: true, data: data });
     } else {
       res.json({ result: false, error: "User not found or wrong password" });
-    }
-  });
-});
-
-//Delete user coach
-router.delete("/deleteCoach", (req, res) => {
-  if (!checkBody(req.body, ["email"])) {
-    res.json({ result: false, error: "Missing or empty fields" });
-    return;
-  }
-
-  Coach.deleteOne({ email: req.body.email.toLowerCase() }).then((data) => {
-    if (data.deletedCount === 1) {
-      res.json({ result: true, message: "User deleted" });
-    } else {
-      res.json({ result: false, error: "User not found" });
     }
   });
 });

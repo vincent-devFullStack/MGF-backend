@@ -170,9 +170,9 @@ router.delete("/deleteAccount", async (req, res) => {
   const deleteAccount = await Coach.deleteOne({ token: req.body.coachToken });
 
   if (!deleteAccount) {
-    return res.json({ error: "Account wasn't deleted!" });
+    return res.json({ error: "Le compte n'a pas été supprimé!" });
   }
 
-  res.json({ result: true, message: "Account was deleted!" });
+  res.json({ result: true, message: "Compte supprimé avec succès!" });
 });
 module.exports = router;

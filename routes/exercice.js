@@ -65,7 +65,7 @@ router.post("/new", async (req, res) => {
   const exercice = await Exercice.findOne({ name: req.body.name });
 
   if (exercice) {
-    return res.json({ result: false, error: "Exercice already exists" });
+    return res.json({ result: false, error: "Cet exercice existe déjà" });
   }
 
   const newExercice = new Exercice({
@@ -81,7 +81,7 @@ router.post("/new", async (req, res) => {
   const addExercice = await newExercice.save();
 
   if (!addExercice) {
-    return res.json({ error: "Exercice wasn't created" });
+    return res.json({ error: "L'exercice n'a pas pu être créé" });
   }
 
   const coach = await Coach.findOne({ token: req.body.coachToken });
@@ -114,7 +114,7 @@ router.post("/delete", async (req, res) => {
 
   const coach = await Coach.findOne({ token: req.body.coachToken });
   if (!coach) {
-    return res.json({ result: false, error: "Coach not found" });
+    return res.json({ result: false, error: "Coach non trouvé" });
   }
 
   const exerciceDelete = await Exercice.deleteOne({
@@ -122,13 +122,13 @@ router.post("/delete", async (req, res) => {
   });
 
   if (exerciceDelete.deletedCount === 0) {
-    return res.json({ error: "Exercice wasn't found" });
+    return res.json({ error: "Exercice non trouvé" });
   }
 
   coach.exercices = coach.exercices.filter((exo) => exo.name !== req.body.name);
   await coach.save();
 
-  res.json({ result: true, message: "Exercice was deleted" });
+  res.json({ result: true, message: "Exercice supprimé avec succès!" });
 });
 
 module.exports = router;

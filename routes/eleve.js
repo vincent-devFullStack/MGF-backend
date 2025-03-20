@@ -51,10 +51,10 @@ router.post("/chat", async (req, res) => {
   );
 
   if (!message) {
-    return res.json({ error: "Message wasn't sent!" });
+    return res.json({ error: "Le message n'a pas été envoyé!" });
   }
 
-  res.json({ result: true, message: "Message was sent!" });
+  res.json({ result: true, message: "Le message a été envoyé!" });
 });
 
 /* Delete message tchat */
@@ -68,7 +68,7 @@ router.delete("/delete-message", async (req, res) => {
   const eleve = await Eleve.findOne({ token });
 
   if (!eleve) {
-    return res.json({ result: false, error: "Student not found" });
+    return res.json({ result: false, error: "Eleve non trouvé" });
   }
 
   eleve.conversations = eleve.conversations.filter(
@@ -77,7 +77,7 @@ router.delete("/delete-message", async (req, res) => {
 
   await eleve.save();
 
-  res.json({ result: true, message: "Message deleted successfully" });
+  res.json({ result: true, message: "Message supprimé avec succès" });
 });
 
 /* Ajout premières mesures */
@@ -117,10 +117,10 @@ router.post("/first-mesures", async (req, res) => {
   );
 
   if (!mesures) {
-    return res.json({ error: "Body mesures weren't added!" });
+    return res.json({ error: "Les mesures n'ont pas été ajoutée" });
   }
 
-  res.json({ result: true, message: "Body mesures were added!" });
+  res.json({ result: true, message: "Mesures ajoutées avec succès!" });
 });
 
 /* Update mesures */
@@ -160,10 +160,10 @@ router.post("/mesures", async (req, res) => {
   );
 
   if (!mesures) {
-    return res.json({ error: "Body mesures weren't updated!" });
+    return res.json({ error: "Les mesures n'ont pas été mises à jour" });
   }
 
-  res.json({ result: true, message: "Body mesures were updated!" });
+  res.json({ result: true, message: "Mesures misent à jour avec succès!" });
 });
 
 /* Ajout ossature */
@@ -207,14 +207,14 @@ router.post("/ossature", async (req, res) => {
   );
 
   if (!ossatures) {
-    return res.json({ error: "Skeletons weren't updated!" });
+    return res.json({ error: "Mesures ossature n'ont pas été ajoutées" });
   }
 
-  res.json({ result: true, message: "Skeletons were updated!" });
+  res.json({ result: true, message: "Mesures ossature ajoutées avec succès!" });
 });
 
 /* Ajout morphologie muscles */
-router.post("/ossature", async (req, res) => {
+router.post("/musculaire", async (req, res) => {
   if (
     !checkBody(req.body, [
       "token",
@@ -274,29 +274,13 @@ router.post("/ossature", async (req, res) => {
   );
 
   if (!muscles) {
-    return res.json({ error: "Morphologies weren't updated!" });
+    return res.json({ error: "Morphologie musculaire non ajoutée" });
   }
 
-  res.json({ result: true, message: "Morphologies were updated!" });
-});
-
-/* Upload photo */
-router.post("/upload", async (req, res) => {
-  const photoPath = `./tmp/${uniqid()}.jpg`;
-  const resultMove = await req.files.photoFromFront.mv(photoPath);
-
-  if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-
-    fs.unlinkSync(photoPath);
-
-    res.json({
-      result: true,
-      url: cloudinary.url(resultCloudinary.secure_url),
-    });
-  } else {
-    res.json({ result: false, error: resultMove });
-  }
+  res.json({
+    result: true,
+    message: "Morphologie musculaire ajoutée avec succès!",
+  });
 });
 
 /* Ajout premières photos */
@@ -317,10 +301,10 @@ router.post("/first-photos", async (req, res) => {
   );
 
   if (!photos) {
-    return res.json({ error: "Pictures weren't added!" });
+    return res.json({ error: "Photos non ajoutées" });
   }
 
-  res.json({ result: true, message: "Pictures were added!" });
+  res.json({ result: true, message: "Photos ajoutées avec succès!" });
 });
 
 /* Ajout photos actuelles*/
@@ -341,28 +325,28 @@ router.post("/photos", async (req, res) => {
   );
 
   if (!photos) {
-    return res.json({ error: "Pictures weren't added!" });
+    return res.json({ error: "Photos non ajoutées" });
   }
 
-  res.json({ result: true, message: "Pictures were added!" });
+  res.json({ result: true, message: "Photos ajoutées avec succès!" });
 });
 
 /* Ajout programme*/
 router.post("/programme", async (req, res) => {
-  if (!checkBody(req.body, ["email", "id"])) {
+  if (!checkBody(req.body, ["eleveToken", "id"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
   const programmeEleve = await Eleve.updateOne(
-    { email: req.body.email },
+    { token: req.body.eleveToken },
     { programmes: req.body.id }
   );
 
   if (!programmeEleve) {
-    return res.json({ error: "Programme wasn't added!" });
+    return res.json({ error: "Programme non ajouté" });
   }
 
-  res.json({ result: true, message: "Programme was added!" });
+  res.json({ result: true, message: "Programme ajouté avec succès!" });
 });
 
 /* Récupérer les rdv de l'élève */
@@ -379,7 +363,7 @@ router.get("/rdv/:token", async (req, res) => {
     })
 
     .populate({
-      path: "programmes",
+      path: "historique",
       populate: {
         path: "exercices.exercice",
       },
@@ -387,25 +371,28 @@ router.get("/rdv/:token", async (req, res) => {
   if (!eleve) {
     return res.json({ result: false, message: "Eleve non trouvé" });
   }
-  res.json({ result: true, rdv: eleve.rdv, programmes: eleve.programmes });
+  res.json({ result: true, rdv: eleve.rdv, programme: eleve.historique });
 });
 
 /* Delete programme*/
 router.delete("/programme", async (req, res) => {
-  if (!checkBody(req.body, ["email"])) {
+  if (!checkBody(req.body, ["eleveToken"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
   const deleteProgramme = await Eleve.updateOne(
-    { email: req.body.email },
+    { token: req.body.eleveToken },
     { programmes: null }
   );
 
   if (!deleteProgramme) {
-    return res.json({ error: "Programme wasn't deleted!" });
+    return res.json({ error: "Le programme n'a pas été supprimé" });
   }
 
-  res.json({ result: true, message: "Programme was deleted!" });
+  res.json({
+    result: true,
+    message: "Le programme a été supprimé avec succès!",
+  });
 });
 
 /* Delete compte*/
@@ -417,10 +404,10 @@ router.delete("/deleteAccount", async (req, res) => {
   const deleteAccount = await Eleve.deleteOne({ token: req.body.eleveToken });
 
   if (!deleteAccount) {
-    return res.json({ error: "Account wasn't deleted!" });
+    return res.json({ error: "Le compte n'a pas été supprimé" });
   }
 
-  res.json({ result: true, message: "Account was deleted!" });
+  res.json({ result: true, message: "Compte supprimé avec succès !" });
 });
 
 module.exports = router;

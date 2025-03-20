@@ -42,7 +42,7 @@ router.post("/new", async (req, res) => {
   const programme = await Programme.findOne({ name: req.body.name });
 
   if (programme) {
-    return res.json({ result: false, error: "Programme already exists" });
+    return res.json({ result: false, error: "Le programme existe déjà" });
   }
 
   const newProgramme = new Programme({
@@ -57,7 +57,7 @@ router.post("/new", async (req, res) => {
   const addProgramme = await newProgramme.save();
 
   if (!addProgramme) {
-    return res.json({ error: "Programme wasn't created" });
+    return res.json({ error: "Le programme n'a pas été créé" });
   }
 
   const coach = await Coach.findOne({ token: req.body.coachToken });
@@ -75,10 +75,10 @@ router.post("/update", async (req, res) => {
   );
 
   if (!updateProg) {
-    return res.json({ error: "Programme wasn't found" });
+    return res.json({ error: "Programme non trouvé" });
   }
 
-  res.json({ result: true, message: "Programme was updated" });
+  res.json({ result: true, message: "Programme mise à jour" });
 });
 
 /* delete programme */
@@ -91,7 +91,7 @@ router.post("/delete", async (req, res) => {
   const coach = await Coach.findOne({ token: req.body.coachToken });
 
   if (!coach) {
-    return res.json({ result: false, error: "Coach not found" });
+    return res.json({ result: false, error: "Coach non trouvé" });
   }
 
   const programmeDelete = await Programme.deleteOne({
@@ -99,7 +99,7 @@ router.post("/delete", async (req, res) => {
   });
 
   if (programmeDelete.deletedCount === 0) {
-    return res.json({ result: false, error: "Programme wasn't found" });
+    return res.json({ result: false, error: "Programme non trouvé" });
   }
 
   coach.programmes = coach.programmes.filter(
@@ -107,7 +107,7 @@ router.post("/delete", async (req, res) => {
   );
   await coach.save();
 
-  res.json({ result: true, message: "Programme was deleted" });
+  res.json({ result: true, message: "Programme supprimé avec succès !" });
 });
 
 module.exports = router;
