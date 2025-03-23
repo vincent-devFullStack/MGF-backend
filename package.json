@@ -23,5 +23,8 @@
     "serve-favicon": "^2.5.0",
     "uid2": "^1.0.0",
     "uniqid": "^5.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
