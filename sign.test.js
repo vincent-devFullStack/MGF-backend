@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("./app");
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const e = require("cors");
 const connectionString = process.env.CONNECTION_STRING;
 
 const client = new MongoClient(connectionString, {
