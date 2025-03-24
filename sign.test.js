@@ -146,21 +146,23 @@ describe("POST /signupEleve", () => {
     expect(res.body.error).toBe("Missing or empty fields");
   });
 
-  test("Retourne true si l'utilisateur se connecte avec succès", async () => {
-    const res = await request(app).post("/signinEleve").send(connexion);
+  describe("POST /signinEleve", () => {
+    test("Retourne true si l'utilisateur se connecte avec succès", async () => {
+      const res = await request(app).post("/signinEleve").send(connexion);
 
-    expect(res.status).toBe(200);
-    expect(res.body.result).toBe(true);
-  });
-
-  test("Retourne false si le l'identifiant ou le mot de passe n'est pas bon", async () => {
-    const res = (await request(app).post("/signinEleve")).setEncoding({
-      email: "testFalse@hotmail.fr",
-      password: "test",
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(true);
     });
 
-    expect(res.status).toBe(200);
-    expect(res.body.result).toBe(false);
-    expect(res.body.error).toBe("User not found or wrong password");
+    test("Retourne false si l'identifiant ou le mot de passe n'est pas bon", async () => {
+      const res = await request(app).post("/signinEleve").send({
+        email: "testFalse@hotmail.fr",
+        password: "test",
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBe(false);
+      expect(res.body.error).toBe("User not found or wrong password");
+    });
   });
 });
