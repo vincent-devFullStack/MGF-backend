@@ -26,6 +26,7 @@
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^5.1.0",
     "jest": "^29.7.0",
     "supertest": "^7.1.0"
   }
