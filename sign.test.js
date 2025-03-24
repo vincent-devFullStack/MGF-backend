@@ -49,6 +49,11 @@ const coachMockupWithMissingField = {
   presentation: "test",
 };
 
+const connexion = {
+  email: "testelevejest@hotmail.fr",
+  password: "test",
+};
+
 describe("POST /signupCoach", () => {
   test("Retourne true si l'utilisateur est créé avec succès", async () => {
     await client.connect();
@@ -139,5 +144,23 @@ describe("POST /signupEleve", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(false);
     expect(res.body.error).toBe("Missing or empty fields");
+  });
+
+  test("Retourne true si l'utilisateur se connecte avec succès", async () => {
+    const res = await request(app).post("/signinEleve").send(connexion);
+
+    expect(res.status).toBe(200);
+    expect(res.body.result).toBe(true);
+  });
+
+  test("Retourne false si le l'identifiant ou le mot de passe n'est pas bon", async () => {
+    const res = (await request(app).post("/signinEleve")).setEncoding({
+      email: "testFalse@hotmail.fr",
+      password: "test",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.result).toBe(false);
+    expect(res.body.error).toBe("User not found or wrong password");
   });
 });
