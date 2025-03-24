@@ -12,7 +12,7 @@ const client = new MongoClient(connectionString, {
   },
 });
 
-const coachMockup = {
+const coachMockData = {
   name: "test",
   firstname: "test",
   email: "testcoachjest@hotmail.fr",
@@ -31,7 +31,7 @@ const coachMockup = {
   presentation: "test",
 };
 
-const coachMockupWithMissingField = {
+const coachMockDataWithMissingField = {
   name: "test",
   firstname: "test",
   password: "test",
@@ -58,7 +58,7 @@ describe("POST /signupCoach", () => {
   test("Retourne true si l'utilisateur est créé avec succès", async () => {
     await client.connect();
 
-    const res = await request(app).post("/signupCoach").send(coachMockup);
+    const res = await request(app).post("/signupCoach").send(coachMockData);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(true);
@@ -67,7 +67,7 @@ describe("POST /signupCoach", () => {
   test("Retourne false si l'utilisateur existe déjà", async () => {
     await client.connect();
 
-    const res = await request(app).post("/signupCoach").send(coachMockup);
+    const res = await request(app).post("/signupCoach").send(coachMockData);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(false);
@@ -79,7 +79,7 @@ describe("POST /signupCoach", () => {
 
     const res = await request(app)
       .post("/signupCoach")
-      .send(coachMockupWithMissingField);
+      .send(coachMockDataWithMissingField);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(false);
@@ -87,7 +87,7 @@ describe("POST /signupCoach", () => {
   });
 });
 
-const eleveMockup = {
+const eleveMockData = {
   name: "test",
   firstname: "test",
   email: "testelevejest@hotmail.fr",
@@ -101,7 +101,7 @@ const eleveMockup = {
   taille: 180,
 };
 
-const eleveMockupWithMissingField = {
+const eleveMockDataWithMissingField = {
   name: "test",
   firstname: "test",
   email: "testelevejest@hotmail.fr",
@@ -118,7 +118,7 @@ describe("POST /signupEleve", () => {
   test("Retourne true si l'utilisateur est créé avec succès", async () => {
     await client.connect();
 
-    const res = await request(app).post("/signupEleve").send(eleveMockup);
+    const res = await request(app).post("/signupEleve").send(eleveMockData);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(true);
@@ -127,7 +127,7 @@ describe("POST /signupEleve", () => {
   test("Retourne false si l'utilisateur existe déjà", async () => {
     await client.connect();
 
-    const res = await request(app).post("/signupEleve").send(eleveMockup);
+    const res = await request(app).post("/signupEleve").send(eleveMockData);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(false);
@@ -139,7 +139,7 @@ describe("POST /signupEleve", () => {
 
     const res = await request(app)
       .post("/signupEleve")
-      .send(eleveMockupWithMissingField);
+      .send(eleveMockDataWithMissingField);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.result).toBe(false);
